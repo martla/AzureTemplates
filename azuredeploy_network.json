@@ -106,6 +106,24 @@
           "name" : "subnet-nsg-loop",
           "mode": "Serial"
         }
+    },
+    {
+      "apiVersion": "2016-09-01",
+      "type": "Microsoft.Network/virtualNetworks/providers/locks",
+      "name": "[concat(parameters('NetworkSettings').VNets[copyIndex()].name, concat('/Microsoft.Authorization/', parameters('NetworkSettings').VNets[copyIndex()].name, '-Lock'))]",
+      "copy": {
+        "count": "[length(parameters('NetworkSettings').VNets)]",
+        "name": "vnetlockloop",
+        "mode": "serial",
+        "batchSize": 1
+      },
+      "dependsOn": [
+        "subnet-nsg-loop"
+      ],
+      "properties": {
+        "level": "ReadOnly",
+        "notes": "Virtual networks should not be modified or deleted."
+      }
     }
   ],
   "outputs": {
