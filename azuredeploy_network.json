@@ -1,0 +1,113 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "NetworkSettings": {
+      "type": "object"
+    }
+  },
+  "variables": {
+  },
+  "resources": [
+    {
+      "apiVersion": "2016-03-30",
+      "type": "Microsoft.Network/virtualNetworks",
+      "copy": {
+        "count": "[length(parameters('NetworkSettings').VNets)]",
+        "name": "vNet-loop",
+        "mode": "Serial"
+      },
+      "location": "[resourceGroup().location]",
+      "name": "[parameters('NetworkSettings').VNets[copyIndex()].name]",
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": "[parameters('NetworkSettings').VNets[copyIndex()].addressPrefixes]"
+        }
+      }
+    },
+    {
+      "apiVersion": "2017-10-01",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "name": "[parameters('NetworkSettings').NSGs[copyIndex()].nsgName]",
+      "location": "[resourceGroup().location]",
+      "copy": {
+        "count": "[length(parameters('NetworkSettings').NSGs)]",
+        "name": "NSG-loop",
+        "mode": "Serial"
+      },
+      "properties": {
+        "securityRules": "[parameters('NetworkSettings').NSGs[copyIndex()].securityRules]"
+      }
+    },
+    {
+      "apiVersion": "2017-05-10",
+      "name": "[concat('linkedTemplateSubnet', copyIndex())]",
+      "type": "Microsoft.Resources/deployments",
+      "condition": "[equals(parameters('NetworkSettings').Subnets[copyIndex()].NSGName, 'None')]",
+      "properties": {
+        "mode": "Incremental",
+        "template":{
+           "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+            "contentVersion": "1.0.0.0",
+            "resources": [
+              {
+                "apiVersion": "2017-10-01",
+                "type": "Microsoft.Network/virtualNetworks/subnets",
+                "name": "[concat(parameters('NetworkSettings').Subnets[copyIndex()].vNetName, '/', parameters('NetworkSettings').Subnets[copyIndex()].name)]",
+                "location": "[resourceGroup().location]",
+                "properties": {
+                    "addressPrefix": "[parameters('NetworkSettings').Subnets[copyIndex()].addressPrefix]"
+                }
+              }
+            ]
+        }
+      },
+      "dependsOn": [
+        "vNet-loop",
+        "NSG-loop"
+      ],
+      "copy": {
+        "count": "[length(parameters('NetworkSettings').Subnets)]",
+        "name" : "subnet-loop",
+        "mode": "Serial"
+      }
+    },
+    {
+        "apiVersion": "2017-05-10",
+        "name": "[concat('linkedTemplateSubnetWithNSG', copyIndex())]",
+        "type": "Microsoft.Resources/deployments",
+        "condition": "[not(equals(parameters('NetworkSettings').Subnets[copyIndex()].NSGName, 'None'))]",
+        "properties": {
+            "mode": "Incremental",
+            "template":{
+                "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                "contentVersion": "1.0.0.0",
+                "resources": [
+                    {
+                      "apiVersion": "2017-10-01",
+                      "type": "Microsoft.Network/virtualNetworks/subnets",
+                      "name": "[concat(parameters('NetworkSettings').Subnets[copyIndex()].vNetName, '/', parameters('NetworkSettings').Subnets[copyIndex()].name)]",
+                      "location": "[resourceGroup().location]",
+                      "properties": {
+                        "addressPrefix": "[parameters('NetworkSettings').Subnets[copyIndex()].addressPrefix]",
+                        "networkSecurityGroup": {
+                          "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('NetworkSettings').Subnets[copyIndex()].NSGname)]"
+                          }
+                      }
+                    }
+                ]
+            }
+        },
+        "dependsOn": [
+          "subnet-loop"
+        ],
+        "copy": {
+          "count": "[length(parameters('NetworkSettings').Subnets)]",
+          "name" : "subnet-nsg-loop",
+          "mode": "Serial"
+        }
+    }
+  ],
+  "outputs": {
+  }
+}
