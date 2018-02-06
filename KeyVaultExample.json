@@ -14,9 +14,5 @@
   "resources": [
   ],
   "outputs": {
-    "password": {
-       "value": "[parameters('domainPassword')]",
-       "type": "string"
-    }
   }
 }
