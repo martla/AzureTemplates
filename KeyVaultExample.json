@@ -2,25 +2,18 @@
   "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "vpnType": {
-      "type": "string",
-      "metadata": {
-        "description": "Route based or policy based"
-      },
-      "defaultValue": "RouteBased"
-    },
-    "localGatewayName": {
-      "type": "string",
-      "metadata": {
-        "description": "Arbitrary name for the local gateway resource."
-      }
-    },
-    "sharedKey": {
-      "type": "string"
+    "adminPassword": {
+      "type": "secureString"
     }
   },
   "variables": {
   },
   "resources": [
-  ]
+  ],
+  "outputs": {
+    "referenceId": {
+       "value": "[parameters('adminPassword')]",
+       "type": "string"
+    }
+  }
 }
