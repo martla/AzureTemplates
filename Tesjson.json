@@ -20,7 +20,7 @@
       "properties": {
         "mode": "incremental",
         "templateLink": {
-          "uri": "https://raw.githubusercontent.com/martla/AzureTemplates/master/Tesjson.json",
+          "uri": "https://raw.githubusercontent.com/martla/AzureTemplates/master/KeyVaultExample.json",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -38,7 +38,7 @@
     "outputs": {
         "messageFromLinkedTemplate": {
             "type": "string",
-            "value": "[reference('nestedTemplate').outputs.referenceID.value]"
+            "value": "[reference('nestedTemplate').outputs.password.value]"
         }
     }
 }
