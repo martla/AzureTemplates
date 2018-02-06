@@ -39,10 +39,5 @@
         }
       }
     }],
-    "outputs": {
-        "messageFromLinkedTemplate": {
-            "type": "string",
-            "value": "[reference('nestedTemplate').outputs.password.value]"
-        }
-    }
+    "outputs": {}
 }
