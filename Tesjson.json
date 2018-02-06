@@ -35,5 +35,10 @@
         }
       }
     }],
-    "outputs": {}
+    "outputs": {
+        "messageFromLinkedTemplate": {
+            "type": "string",
+            "value": "[reference('nestedTemplate').outputs.referenceID.value]"
+        }
+    }
 }
