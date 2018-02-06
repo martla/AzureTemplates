@@ -15,56 +15,6 @@
         "description": "Arbitrary name for the local gateway resource."
       }
     },
-    "localGatewayIpAddress": {
-      "type": "string",
-      "metadata": {
-        "description": "Public IP of the local VPN gateway."
-      }
-    },
-    "localAddressPrefix": {
-      "type": "array",
-      "metadata": {
-        "description": "CIDR block representing the address space of the on-premise VPN network's subnet"
-      }
-    },
-    "virtualNetworkName": {
-      "type": "string",
-      "defaultValue": "vnet-core",
-      "metadata": {
-        "description": "Arbitrary name for the Azure Virtual Network"
-      }
-    },
-    "gatewayPublicIPName": {
-      "type": "string",
-      "metadata": {
-        "description": "Arbitrary name for public IP resource used for the new azure gateway"
-      }
-    },
-    "gatewayName": {
-      "type": "string",
-      "metadata": {
-        "description": "Arbitrary name for the new gateway"
-      }
-    },
-    "gatewaySku": {
-      "type": "string",
-      "defaultValue": "VpnGw1",
-      "allowedValues": [
-        "Basic",
-        "VpnGw1",
-        "VpnGw2",
-        "VpnGw3"
-      ],
-      "metadata": {
-        "description": "The Sku of the Gateway. This must be one of Basic, VpnGw1, VpnGw2, or VpnGw3."
-      }
-    },
-    "connectionName": {
-      "type": "string",
-      "metadata": {
-        "description": "Arbitrary name for the new connection between Azure VNet and the on-premises network"
-      }
-    },
     "sharedKey": {
       "type": "securestring"
     }
