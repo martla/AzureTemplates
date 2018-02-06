@@ -10,6 +10,9 @@
       },
       "keyVaultSecretName": {
         "type": "string"
+      },
+      "additionalParameter": {
+        "type": "string"
       }
     },
     "resources": [
@@ -31,7 +34,8 @@
               },
               "secretName": "[parameters('keyVaultSecretName')]"
             }
-          }
+          },
+          "additionalParameter": { "value": "[parameters('additionalParameter')]" }
         }
       }
     }],
