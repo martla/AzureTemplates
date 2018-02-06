@@ -4,6 +4,9 @@
   "parameters": {
     "domainPassword": {
       "type": "secureString"
+    },
+    "additionalParameter": {
+      "type": "string"  
     }
   },
   "variables": {
