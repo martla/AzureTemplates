@@ -16,7 +16,7 @@
       }
     },
     "sharedKey": {
-      "type": "securestring"
+      "type": "string"
     }
   },
   "variables": {
