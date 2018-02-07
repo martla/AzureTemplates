@@ -3,16 +3,25 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "domainPassword": {
-      "type": "secureString"
-    },
-    "additionalParameter": {
-      "type": "string"  
-    }
+            "reference": {
+              "keyVault": {
+                "id": "/subscriptions/dead-beef-12345etc. /resourceGroups/RGname/providers/Microsoft.KeyVault/vaults/Vaulname"
+              },
+              "secretName": "domainPassword"
+            },
+            "metadata": {
+              "description": "Password of the Active Directory (AD) Domain Join account"
+            }
+          }
   },
   "variables": {
   },
   "resources": [
   ],
   "outputs": {
+    "myOutput": {
+            "value": "[parameters('domainPassword')]",
+            "type": "string"
+     }
   }
 }
