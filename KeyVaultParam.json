@@ -5,9 +5,9 @@
     "domainPassword": {
             "reference": {
               "keyVault": {
-                "id": "/subscriptions/dead-beef-12345etc. /resourceGroups/RGname/providers/Microsoft.KeyVault/vaults/Vaulname"
+                "id": "/subscriptions/24087008-10b3-4df6-aacc-d9e348086817/resourceGroups/KeyVault-RG/providers/Microsoft.KeyVault/vaults/Lama1018KeyVault"
               },
-              "secretName": "domainPassword"
+              "secretName": "VPN-FB-SharedKey"
             },
             "metadata": {
               "description": "Password of the Active Directory (AD) Domain Join account"
