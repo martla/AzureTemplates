@@ -1,8 +1,12 @@
+[CmdletBinding()]
 Param(
-[Parameter(Mandatory=$true)]$VSTSAccount
+[Parameter(Mandatory=$true)]$VSTSAccount = "daimler",
+[Parameter(Mandatory=$true)]$PersonalAccessToken,
+[Parameter(Mandatory=$true)]$AgentName,
+[Parameter(Mandatory=$true)]$PoolName = "Core Windows"
 )
 
-"Test file output" >> C:\Users\coreops\Downloads\testfile2.txt
+"Result: $VSTSAccount $PersonalAccesstoken $AgentName $PoolName" >> C:\Users\coreops\Downloads\testfile2.txt
 
 <#
 $ErrorActionPreference = "Stop"
