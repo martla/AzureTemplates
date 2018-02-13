@@ -6,7 +6,7 @@ Param(
 [Parameter(Mandatory=$true)]$PoolName = "Core Windows"
 )
 
-"Result: $VSTSAccount $PersonalAccesstoken $AgentName $PoolName" >> C:\Users\coreops\Downloads\testfile2.txt
+"Result" >> C:\Users\coreops\Downloads\testfile2.txt
 
 <#
 $ErrorActionPreference = "Stop"
