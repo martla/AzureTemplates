@@ -5,10 +5,7 @@
 # Enable -Verbose option
 [CmdletBinding()]
 Param(
-[Parameter(Mandatory=$true)]$VSTSAccount = "daimler",
-[Parameter(Mandatory=$true)]$PersonalAccessToken,
-[Parameter(Mandatory=$true)]$AgentName,
-[Parameter(Mandatory=$true)]$PoolName = "Core Windows"
+[Parameter(Mandatory=$true)]$VSTSAccount
 )
 
 "Test file output" >> C:\Users\coreops\Downloads\testfile2.txt
