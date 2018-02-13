@@ -6,8 +6,6 @@ Param(
 [Parameter(Mandatory=$true)] [string] $PoolName = 'Core Windows'
 )
 
-"Result" >> C:\Users\coreops\Downloads\testfile2.txt
-
 $ErrorActionPreference = "Stop"
 
 Write-Verbose "Entering InstallVSTSAgent.ps1" -verbose
