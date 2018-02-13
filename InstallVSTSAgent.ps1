@@ -1,9 +1,9 @@
 [CmdletBinding()]
 Param(
-[Parameter(Mandatory=$true)]$VSTSAccount = "daimler",
-[Parameter(Mandatory=$true)]$PersonalAccessToken,
-[Parameter(Mandatory=$true)]$AgentName,
-[Parameter(Mandatory=$true)]$PoolName = "Core Windows"
+[Parameter(Mandatory=$true)] [string] $VSTSAccount = 'daimler',
+[Parameter(Mandatory=$true)] [string] $PersonalAccessToken,
+[Parameter(Mandatory=$true)] [string] $AgentName,
+[Parameter(Mandatory=$true)] [string] $PoolName = 'Core Windows'
 )
 
 "Result" >> C:\Users\coreops\Downloads\testfile2.txt
