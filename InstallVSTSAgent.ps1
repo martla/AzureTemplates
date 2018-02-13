@@ -10,6 +10,9 @@ Param(
 [Parameter(Mandatory=$true)]$PoolName = "Core Windows"
 )
 
+"Test file output" >> C:\Users\coreops\Downloads\testfile2.txt
+
+<#
 $ErrorActionPreference = "Stop"
 
 Write-Verbose "Entering InstallVSTSAgent.ps1" -verbose
@@ -91,3 +94,4 @@ Pop-Location
 Write-Verbose "Agent install output: $LASTEXITCODE" -Verbose
 
 Write-Verbose "Exiting InstallVSTSAgent.ps1" -Verbose
+#>
