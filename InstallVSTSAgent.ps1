@@ -1,4 +1,4 @@
-<#
+
 # Downloads the Visual Studio Team Services Build Agent and installs on the new machine
 # and registers with the Visual Studio Team Services account and build agent pool
 
@@ -10,7 +10,6 @@ Param(
 [Parameter(Mandatory=$true)]$AgentName,
 [Parameter(Mandatory=$true)]$PoolName = "Core Windows"
 )
-#>
 
 "Test file output" >> C:\Users\coreops\Downloads\testfile2.txt
 
