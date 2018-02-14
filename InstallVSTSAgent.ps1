@@ -99,7 +99,7 @@ Write-Verbose "Exiting InstallVSTSAgent.ps1" -Verbose
 
 
 ##
-## Install Module AzurePS
+## Installing Modules
 ##
 
 Write-Verbose "Installing Module AzureRM..." -verbose
@@ -109,6 +109,13 @@ Set-PSRepository -Name 'PSGallery' -InstallationPolicy Trusted
 Install-Module AzureRM
 
 Write-Verbose "Finished installing Module AzureRM." -Verbose
+
+Write-Verbose "Installing Module Powershell-YAML..." -verbose
+
+Install-Module -Name powershell-yaml -Force -Verbose
+Import-Module powershell-yaml
+
+Write-Verbose "Finished installing Module Powershell-YAML." -Verbose
 
 Write-Verbose "Restarting virtual machine." -Verbose
 Restart-Computer
