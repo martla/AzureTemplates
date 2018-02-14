@@ -111,3 +111,4 @@ Install-Module AzureRM
 Write-Verbose "Finished installing Module AzureRM." -Verbose
 
 Write-Verbose "Restarting virtual machine." -Verbose
+Restart-Computer
