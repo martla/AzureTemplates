@@ -1,12 +1,20 @@
+# Downloads the Visual Studio Team Services Build Agent and installs on the new machine
+# and registers with the Visual Studio Team Services account and build agent pool
+
+# Enable -Verbose option
 [CmdletBinding()]
 Param(
-[Parameter(Mandatory=$true)] [string] $VSTSAccount = 'daimler',
-[Parameter(Mandatory=$true)] [string] $PersonalAccessToken,
-[Parameter(Mandatory=$true)] [string] $AgentName,
-[Parameter(Mandatory=$true)] [string] $PoolName = 'Core Windows'
+[Parameter(Mandatory=$true)]$VSTSAccount = "daimler",
+[Parameter(Mandatory=$true)]$PersonalAccessToken,
+[Parameter(Mandatory=$true)]$AgentName,
+[Parameter(Mandatory=$true)]$PoolName = "Core Windows"
 )
 
 $ErrorActionPreference = "Stop"
+
+##
+## Install VSTS Agent
+##
 
 Write-Verbose "Entering InstallVSTSAgent.ps1" -verbose
 
@@ -87,3 +95,16 @@ Pop-Location
 Write-Verbose "Agent install output: $LASTEXITCODE" -Verbose
 
 Write-Verbose "Exiting InstallVSTSAgent.ps1" -Verbose
+
+
+##
+## Install Module AzurePS
+##
+
+Write-Verbose "Installing Module AzureRM..." -verbose
+
+Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+Set-PSRepository -Name 'PSGallery' -InstallationPolicy Trusted
+Install-Module AzureRM
+
+Write-Verbose "Finished installing Module AzureRM." -Verbose
