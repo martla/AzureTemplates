@@ -58,10 +58,8 @@ $agentInstallationPath = Join-Path "C:" $AgentName
 New-Item -ItemType Directory -Force -Path $agentInstallationPath 
 
 # Create a folder for the build work
-$WorkFolder = "_work"
-
-New-Item -ItemType Directory -Force -Path (Join-Path $agentInstallationPath $WorkFolder)
-
+# $WorkFolder = "_work"
+# New-Item -ItemType Directory -Force -Path (Join-Path $agentInstallationPath $WorkFolder)
 
 Write-Verbose "Extracting the zip file for the agent" -verbose
 $destShellFolder = (new-object -com shell.application).namespace("$agentInstallationPath")
