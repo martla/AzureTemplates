@@ -59,6 +59,7 @@ New-Item -ItemType Directory -Force -Path $agentInstallationPath
 
 # Create a folder for the build work
 $WorkFolder = "_work"
+
 New-Item -ItemType Directory -Force -Path (Join-Path $agentInstallationPath $WorkFolder)
 
 
@@ -108,3 +109,5 @@ Set-PSRepository -Name 'PSGallery' -InstallationPolicy Trusted
 Install-Module AzureRM
 
 Write-Verbose "Finished installing Module AzureRM." -Verbose
+
+Write-Verbose "Restarting virtual machine." -Verbose
