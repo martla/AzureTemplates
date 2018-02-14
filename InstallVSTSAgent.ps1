@@ -58,8 +58,8 @@ $agentInstallationPath = Join-Path "C:" $AgentName
 New-Item -ItemType Directory -Force -Path $agentInstallationPath 
 
 # Create a folder for the build work
-# $WorkFolder = "_work"
-# New-Item -ItemType Directory -Force -Path (Join-Path $agentInstallationPath $WorkFolder)
+$WorkFolder = Join-Path $agentInstallationPath "_work"
+New-Item -ItemType Directory -Force -Path $WorkFolder
 
 Write-Verbose "Extracting the zip file for the agent" -verbose
 $destShellFolder = (new-object -com shell.application).namespace("$agentInstallationPath")
@@ -87,7 +87,7 @@ Write-Verbose "Configuring agent" -Verbose
 # Set the current directory to the agent dedicated one previously created.
 Push-Location -Path $agentInstallationPath
 
-.\config.cmd --unattended --url $serverUrl --auth PAT --token $PersonalAccessToken --pool $PoolName --agent $AgentName --runasservice
+.\config.cmd --unattended --url $serverUrl --auth PAT --token $PersonalAccessToken --pool $PoolName --agent $AgentName --work $WorkFolder --runasservice
 
 Pop-Location
 
