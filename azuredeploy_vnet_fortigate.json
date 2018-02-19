@@ -116,18 +116,6 @@
       }
     },
     {
-      "apiVersion": "2016-09-01",
-      "type": "Microsoft.Network/virtualNetworks/providers/locks",
-      "name": "[concat(parameters('vNetName'), concat('/Microsoft.Authorization/'), 'vnet-Lock') ]",
-      "dependsOn": [
-        "[variables('vnetID')]"
-      ],
-      "properties": {
-        "level": "CanNotDelete",
-        "notes": "Do not delete this network infrastructure."
-      }
-    },
-    {
       "apiVersion": "2017-10-01",
       "type": "Microsoft.Network/routeTables",
       "name": "[variables('routeTableOutsideName')]",
@@ -174,6 +162,9 @@
     {
       "apiVersion": "2017-05-10",
       "type": "Microsoft.Resources/deployments",
+      "dependsOn": [
+        "[variables('vnetID')]"
+      ],
       "name": "vpnEDCTemplate",
       "properties": {
         "mode": "incremental",
