@@ -3,100 +3,64 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "vnetName": {
-      "type": "string",
-      "metadata": {
-        "description": "Name of the Azure virtual network that will host the NVA solution."
-      }
+      "type": "string"
     },
     "vnetAddressPrefix": {
-      "type": "array",
-      "metadata": {
-        "description": "Virtual Network Address prefix(es)"
-      }
+      "type": "array"
     },
     "gatewaySubnetAddress": {
-      "type": "string",
-      "metadata": {
-        "description": "Address space of the gateway subnet"
-      }
+      "type": "string"
     },
     "gatewayName": {
-      "type": "string",
-      "metadata": {
-        "description": "Name of the gateway subnet"
-      }
+      "type": "string"
     },
     "gatewaySku": {
-      "type": "string",
-      "allowedValues": [
-        "Basic",
-        "VpnGw1",
-        "VpnGw2",
-        "VpnGw3"
-      ],
-      "metadata": {
-        "description": "The Sku of the Gateway. This must be one of Basic, VpnGw1, VpnGw2, or VpnGw3."
-      }
+      "type": "string"
+    },
+    "gatewayPublicIPName": {
+      "type": "string"
     },
     "localGatewayName": {
-      "type": "string",
-      "metadata": {
-        "description": "Name of the local VPN gateway"
-      }
+      "type": "string"
     },
     "localGatewayIPAddress": {
-      "type": "string",
-      "metadata": {
-        "description": "IP Address of the local VPN gateway"
-      }
+      "type": "string"
     },
     "localAddressPrefix": {
-      "type": "array",
-      "metadata": {
-        "description": "Address Space(s) of the local VPN gateway"
-      }
+      "type": "array"
     },
-    "connectionName": {
-      "type": "string",
-      "metadata": {
-        "description": "Name of the VPN connection"
-      }
+    "vpnType": {
+      "type": "string"
+    },
+    "connectionNameFB": {
+      "type": "string"
+    },
+    "connectionNameEDC": {
+      "type": "string"
+    },
+    "vpnSharedKeyFB": {
+      "type": "string"
+    },
+    "vpnSharedKeyEDC": {
+      "type": "string"
     },
     "outsideSubnetName": {
-      "type": "string",
-      "metadata": {
-        "description": "Name of the outside subnet"
-      }
+      "type": "string"
     },
     "outsideSubnetAddress": {
-      "type": "string",
-      "metadata": {
-        "description": "Address space of the outside subnet"
-      }
+      "type": "string"
     },
     "insideSubnetName": {
-      "type": "string",
-      "metadata": {
-        "description": "Name of the inside subnet"
-      }
+      "type": "string"
     },
     "insideSubnetAddress": {
-      "type": "string",
-      "metadata": {
-        "description": "Address space of the inside subnet"
-      }
+      "type": "string"
     },
-    "FortiGateNamePrefix": {
-      "type": "string",
-      "metadata": {
-        "description": "The prefix for the FortiGate NVAs ('-1' & '-2' will be appended to the end of each respectively)."
-      }
+    "loadBalancerFrontendIPAzure": {
+      "type": "string"
     },
-    "VPNsharedKey": {
-      "type": "string",
-      "metadata": {
-        "description": "The shared key for the VPN connection."
-      }
+    "loadBalancerFrontendIPEDC": {
+      "type": "string"
     }
   },
   "variables": {
@@ -104,9 +68,8 @@
     "gatewaySubnetRef": "[concat(variables('vnetID'),'/subnets/','GatewaySubnet')]",
     "outsideSubnetRef": "[concat(variables('vnetID'),'/subnets/', parameters('outsideSubnetName'))]",
     "insideSubnetRef": "[concat(variables('vnetID'),'/subnets/', parameters('insideSubnetName'))]",
-    "routeTableOutsideName": "[concat(parameters('outsideSubnetName'),'-',parameters('FortiGateNamePrefix'),'-','RouteTable')]",
-    "routeTableInsideName": "[concat(parameters('insideSubnetName'),'-',parameters('FortiGateNamePrefix'),'-','RouteTable')]",
-    "gatewayPublicIPName": "gateway-pip"
+    "routeTableOutsideName": "[concat(parameters('outsideSubnetName'),'-','RouteTable')]",
+    "routeTableInsideName": "[concat(parameters('insideSubnetName'),'-','RouteTable')]"
   },
   "resources": [
     {
@@ -169,28 +132,66 @@
       "type": "Microsoft.Network/routeTables",
       "name": "[variables('routeTableOutsideName')]",
       "location": "[resourceGroup().location]",
-      "properties": {}
+      "properties": {
+        "routes": [
+          {
+            "name": "[concat('to','-',parameters('insideSubnetName'))]",
+            "properties": {
+              "addressPrefix": "10.0.0.0/8",
+              "nextHopType": "VirtualAppliance",
+              "nextHopIpAddress": "[parameters('LoadBalancerFrontendIPEDC')]"
+            }
+          }
+        ]
+      }
     },
     {
       "apiVersion": "2017-10-01",
       "type": "Microsoft.Network/routeTables",
       "name": "[variables('routeTableInsideName')]",
       "location": "[resourceGroup().location]",
-      "properties": {}
+      "properties": {
+        "routes": [
+          {
+            "name": "[concat('to','-', parameters('insideSubnetName'))]",
+            "properties": {
+              "addressPrefix": "53.0.0.0/8",
+              "nextHopType": "VirtualAppliance",
+              "nextHopIpAddress": "[parameters('LoadBalancerFrontendIPAzure')]"
+            }
+          },
+          {
+            "name": "toDefault",
+            "properties": {
+              "AddressPrefix": "0.0.0.0/0",
+              "nextHopType": "VirtualAppliance",
+              "nextHopIPAddress": "[parameters('LoadBalancerFrontendIPAzure')]"
+            }
+          }
+        ]
+      }
     },
     {
       "apiVersion": "2017-05-10",
-      "name": "linkedTemplate",
       "type": "Microsoft.Resources/deployments",
+      "name": "vpnEDCTemplate",
       "properties": {
         "mode": "incremental",
         "templateLink": {
           "uri": "https://raw.githubusercontent.com/martla/AzureTemplates/master/azuredeploy_S2SVPN.json",
           "contentVersion": "1.0.0.0"
         },
-        "parametersLink": {
-          "uri": "https://raw.githubusercontent.com/martla/AzureTemplates/master/azuredeploy_fortigate.parameters.json",
-          "contentVersion": "1.0.0.0"
+        "parameters": {
+          "vpnType": { "value": "[parameters('vpnType')]" },
+          "localGatewayName": { "value": "[parameters('localGatewayName')]" },
+          "localGatewayIpAddress": { "value": "[parameters('localGatewayIPAddress')]" },
+          "localAddressPrefix": { "value": "[parameters('localAddressPrefix')]" },
+          "virtualNetworkName": { "value": "[parameters('vnetName')]" },
+          "gatewayPublicIPName": { "value": "[parameters('gatewayPublicIPName')]" },
+          "gatewayName": { "value": "[parameters('gatewayName')]" },
+          "gatewaySku": { "value": "[parameters('gatewaySku')]" },
+          "connectionName": { "value": "[parameters('connectionNameEDC')]" },
+          "sharedKey": { "value": "[parameters('vpnSharedKeyEDC')]" }
         }
       }
     }
