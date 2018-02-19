@@ -147,54 +147,6 @@
         "vpnType": "[parameters('vpnType')]",
         "enableBgp": "false"
       }
-    },
-    {
-      "apiVersion": "2016-09-01",
-      "type": "Microsoft.Network/connections/providers/locks",
-      "name": "[concat(parameters('connectionName'), '/Microsoft.Authorization/', parameters('connectionName'), '-Lock')]",
-      "dependsOn": [
-        "[concat('Microsoft.Network/connections/', parameters('connectionName'))]"
-      ],
-      "properties": {
-        "level": "CanNotDelete",
-        "notes": "VPN connections should not be deleted."
-      }
-    },
-    {
-      "apiVersion": "2016-09-01",
-      "type": "Microsoft.Network/publicIPAddresses/providers/locks",
-      "name": "[concat(parameters('gatewayPublicIPName'), '/Microsoft.Authorization/', parameters('gatewayPublicIPName'), '-Lock')]",
-      "dependsOn": [
-        "[concat('Microsoft.Network/connections/', parameters('connectionName'))]"
-      ],
-      "properties": {
-        "level": "CanNotDelete",
-        "notes": "Public IP for VPN connection should not be deleted."
-      }
-    },
-    {
-      "apiVersion": "2016-09-01",
-      "type": "Microsoft.Network/virtualNetworkGateways/providers/locks",
-      "name": "[concat(parameters('gatewayName'), '/Microsoft.Authorization/', parameters('gatewayName'), '-Lock')]",
-      "dependsOn": [
-        "[concat('Microsoft.Network/connections/', parameters('connectionName'))]"
-      ],
-      "properties": {
-        "level": "CanNotDelete",
-        "notes": "VPN Gateway should not be deleted."
-      }
-    },
-    {
-      "apiVersion": "2016-09-01",
-      "type": "Microsoft.Network/localNetworkGateways/providers/locks",
-      "name": "[concat(parameters('localGatewayName'), '/Microsoft.Authorization/', parameters('localGatewayName'), '-Lock')]",
-      "dependsOn": [
-        "[concat('Microsoft.Network/connections/', parameters('connectionName'))]"
-      ],
-      "properties": {
-        "level": "CanNotDelete",
-        "notes": "Local VPN Gateway should not be deleted."
-      }
     }
   ]
 }
