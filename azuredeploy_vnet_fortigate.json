@@ -1,0 +1,198 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vnetName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the Azure virtual network that will host the NVA solution."
+      }
+    },
+    "vnetAddressPrefix": {
+      "type": "array",
+      "metadata": {
+        "description": "Virtual Network Address prefix(es)"
+      }
+    },
+    "gatewaySubnetAddress": {
+      "type": "string",
+      "metadata": {
+        "description": "Address space of the gateway subnet"
+      }
+    },
+    "gatewayName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the gateway subnet"
+      }
+    },
+    "gatewaySku": {
+      "type": "string",
+      "allowedValues": [
+        "Basic",
+        "VpnGw1",
+        "VpnGw2",
+        "VpnGw3"
+      ],
+      "metadata": {
+        "description": "The Sku of the Gateway. This must be one of Basic, VpnGw1, VpnGw2, or VpnGw3."
+      }
+    },
+    "localGatewayName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the local VPN gateway"
+      }
+    },
+    "localGatewayIPAddress": {
+      "type": "string",
+      "metadata": {
+        "description": "IP Address of the local VPN gateway"
+      }
+    },
+    "localAddressPrefix": {
+      "type": "array",
+      "metadata": {
+        "description": "Address Space(s) of the local VPN gateway"
+      }
+    },
+    "connectionName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the VPN connection"
+      }
+    },
+    "outsideSubnetName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the outside subnet"
+      }
+    },
+    "outsideSubnetAddress": {
+      "type": "string",
+      "metadata": {
+        "description": "Address space of the outside subnet"
+      }
+    },
+    "insideSubnetName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the inside subnet"
+      }
+    },
+    "insideSubnetAddress": {
+      "type": "string",
+      "metadata": {
+        "description": "Address space of the inside subnet"
+      }
+    },
+    "FortiGateNamePrefix": {
+      "type": "string",
+      "metadata": {
+        "description": "The prefix for the FortiGate NVAs ('-1' & '-2' will be appended to the end of each respectively)."
+      }
+    },
+    "VPNsharedKey": {
+      "type": "string",
+      "metadata": {
+        "description": "The shared key for the VPN connection."
+      }
+    }
+  },
+  "variables": {
+    "vnetID": "[resourceId('Microsoft.Network/virtualNetworks', parameters('vnetName'))]",
+    "gatewaySubnetRef": "[concat(variables('vnetID'),'/subnets/','GatewaySubnet')]",
+    "outsideSubnetRef": "[concat(variables('vnetID'),'/subnets/', parameters('outsideSubnetName'))]",
+    "insideSubnetRef": "[concat(variables('vnetID'),'/subnets/', parameters('insideSubnetName'))]",
+    "routeTableOutsideName": "[concat(parameters('outsideSubnetName'),'-',parameters('FortiGateNamePrefix'),'-','RouteTable')]",
+    "routeTableInsideName": "[concat(parameters('insideSubnetName'),'-',parameters('FortiGateNamePrefix'),'-','RouteTable')]",
+    "gatewayPublicIPName": "gateway-pip"
+  },
+  "resources": [
+    {
+      "apiVersion": "2017-10-01",
+      "type": "Microsoft.Network/virtualNetworks",
+      "name": "[parameters('vnetName')]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/routeTables/', variables('routeTableOutsideName'))]",
+        "[concat('Microsoft.Network/routeTables/', variables('routeTableInsideName'))]"
+      ],
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[parameters('vnetAddressPrefix')]"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "[parameters('outsideSubnetName')]",
+            "properties": {
+              "addressPrefix": "[parameters('outsideSubnetAddress')]",
+              "routeTable": {
+                "id": "[resourceId('Microsoft.Network/routeTables',variables('routeTableOutsideName'))]"
+              }
+            }
+          },
+          {
+            "name": "[parameters('insideSubnetName')]",
+            "properties": {
+              "addressPrefix": "[parameters('insideSubnetAddress')]",
+              "routeTable": {
+                "id": "[resourceId('Microsoft.Network/routeTables',variables('routeTableInsideName'))]"
+              }
+            }
+          },
+          {
+            "name": "GatewaySubnet",
+            "properties": {
+              "addressPrefix": "[parameters('gatewaySubnetAddress')]"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "2016-09-01",
+      "type": "Microsoft.Network/virtualNetworks/providers/locks",
+      "name": "[concat(parameters('vNetName'), concat('/Microsoft.Authorization/'), 'vnet-Lock') ]",
+      "dependsOn": [
+        "[variables('vnetID')]"
+      ],
+      "properties": {
+        "level": "CanNotDelete",
+        "notes": "Do not delete this network infrastructure."
+      }
+    },
+    {
+      "apiVersion": "2017-10-01",
+      "type": "Microsoft.Network/routeTables",
+      "name": "[variables('routeTableOutsideName')]",
+      "location": "[resourceGroup().location]",
+      "properties": {}
+    },
+    {
+      "apiVersion": "2017-10-01",
+      "type": "Microsoft.Network/routeTables",
+      "name": "[variables('routeTableInsideName')]",
+      "location": "[resourceGroup().location]",
+      "properties": {}
+    },
+    {
+      "apiVersion": "2017-05-10",
+      "name": "linkedTemplate",
+      "type": "Microsoft.Resources/deployments",
+      "properties": {
+        "mode": "incremental",
+        "templateLink": {
+          "uri": "https://raw.githubusercontent.com/martla/AzureTemplates/master/azuredeploy_S2SVPN.json",
+          "contentVersion": "1.0.0.0"
+        },
+        "parametersLink": {
+          "uri": "https://raw.githubusercontent.com/martla/AzureTemplates/master/azuredeploy_fortigate.parameters.json",
+          "contentVersion": "1.0.0.0"
+        }
+      }
+    }
+  ]
+}
