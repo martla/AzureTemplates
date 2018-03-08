@@ -58,7 +58,9 @@ $agentInstallationPath = Join-Path "C:" $AgentName
 New-Item -ItemType Directory -Force -Path $agentInstallationPath 
 
 # Create a folder for the build work
-New-Item -ItemType Directory -Force -Path (Join-Path $agentInstallationPath "_work")
+$WorkFolder = "_work"
+New-Item -ItemType Directory -Force -Path (Join-Path $agentInstallationPath $WorkFolder)
+
 
 Write-Verbose "Extracting the zip file for the agent" -verbose
 $destShellFolder = (new-object -com shell.application).namespace("$agentInstallationPath")
@@ -96,7 +98,7 @@ Write-Verbose "Exiting InstallVSTSAgent.ps1" -Verbose
 
 
 ##
-## Installing Modules
+## Install Module AzurePS
 ##
 
 Write-Verbose "Installing Module AzureRM..." -verbose
@@ -107,12 +109,40 @@ Install-Module AzureRM
 
 Write-Verbose "Finished installing Module AzureRM." -Verbose
 
-Write-Verbose "Installing Module Powershell-YAML..." -verbose
 
-Install-Module -Name powershell-yaml -Force -Verbose
-Import-Module powershell-yaml
+##
+## Install Azure CLI (latest)
+## 
+Write-Verbose "Installing Azure CLI ..." -verbose
 
-Write-Verbose "Finished installing Module Powershell-YAML." -Verbose
+$retryCount = 3
+$retries = 1
+Write-Verbose "Downloading Azure CLI .msi file" -verbose
+$azureCliLocation = "$agentTempFolderName\azure-cli-latest.msi"
+do
+{
+  try
+  {
+    Write-Verbose "Trying to get download URL for latest Azure CLI release..."
+    $latestReleaseDownloadUrl = "https://azurecliprod.blob.core.windows.net/msi/azure-cli-latest.msi"
+    Invoke-WebRequest -Uri $latestReleaseDownloadUrl -Method Get -OutFile $azureCliLocation
+    Write-Verbose "Downloaded Azure CLI successfully on attempt $retries" -verbose
+		
+	$product= [WMICLASS]"\\.\ROOT\CIMV2:win32_Product"
+	$product.Install($azureCliLocation)
+    
+	break
+  }
+  catch
+  {
+    $exceptionText = ($_ | Out-String).Trim()
+    Write-Verbose "Exception occured downloading Azure CLI: $exceptionText in try number $retries" -verbose
+    $retries++
+    Start-Sleep -Seconds 30 
+  }
+} 
+while ($retries -le $retryCount)
 
-Write-Verbose "Restarting virtual machine." -Verbose
+
+Write-Verbose "Restarting virtual machine to apply latest changes." -Verbose
 Restart-Computer
