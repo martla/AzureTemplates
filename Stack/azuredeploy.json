@@ -20,10 +20,16 @@
           "description": "The key to the Storage Account where the custom script extension files are stored."
         }
       },
-      "scriptURL": {
+      "scriptURL1": {
         "type": "string",
         "metadata": {
-          "description": "URL to the Oracle install script in the storage account, e.g. 'https://mystorageaccount123.blob.core.windows.net/oracle/install.sh'"
+          "description": "URL to the Oracle install script in the storage account."
+        }
+      },
+      "scriptURL2": {
+        "type": "string",
+        "metadata": {
+          "description": "URL to the Oracle yaml file in the storage account."
         }
       },
       "suseOSVersion": {
@@ -169,10 +175,9 @@
                 },
                 "protectedSettings": {
                     "commandToExecute": "bash install.sh",
-                    "storageAccountName": "[parameters('storageAccountName')]",
-                    "storageAccountKey": "[parameters('storageAccountKey')]",
                     "fileUris": [
-                    "[parameters('scriptURL')]"
+                       "[parameters('scriptURL1')]",
+                       "[parameters('scriptURL2')]"
                     ]  
                 }
             }
