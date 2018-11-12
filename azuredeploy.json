@@ -1,0 +1,184 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "subnetReference": {
+        "type": "string",
+        "metadata": {
+          "description": "The resourceID of the subnet that will host the VM."
+        }
+      },
+      "storageAccountName": {
+        "type": "string",
+        "metadata": {
+          "description": "Name of the Storage Account where the custom script extension files are stored."
+        }
+      },
+      "storageAccountKey": {
+        "type": "securestring",
+        "metadata": {
+          "description": "The key to the Storage Account where the custom script extension files are stored."
+        }
+      },
+      "scriptURL": {
+        "type": "string",
+        "metadata": {
+          "description": "URL to the Oracle install script in the storage account, e.g. 'https://mystorageaccount123.blob.core.windows.net/oracle/install.sh'"
+        }
+      },
+      "suseOSVersion": {
+        "type": "string",
+        "defaultValue": "12-SP3",
+        "allowedValues": [
+          "12",
+          "12-SP1",
+          "12-SP2",
+          "12-SP3"
+        ],
+        "metadata": {
+          "description": "The SLES version for the VM. This will pick the latest available image of this given SLES version."
+        }
+      },
+      "vmName": {
+        "type": "string",
+        "metadata": {
+          "description": "Name for the Virtual Machine."
+        }
+      },
+      "adminUsername": {
+        "type": "string",
+        "metadata": {
+          "description": "User name for the Virtual Machine."
+        }
+      },
+      "adminPassword": {
+        "type": "securestring",
+        "metadata": {
+          "description": "Password for the Virtual Machine."
+        }
+      }
+    },
+    "variables": {
+      "nicName": "[concat(parameters('vmName'), '_Nic')]",
+      "publicIPAddressName": "SLESpublicIP"
+    },
+    "resources": [
+      {
+        "type": "Microsoft.Network/publicIPAddresses",
+        "apiVersion": "2018-08-01",
+        "name": "[variables('publicIPAddressName')]",
+        "location": "[resourceGroup().location]",
+        "properties": {
+          "publicIPAllocationMethod": "Dynamic"
+        }
+      },
+      {
+        "type": "Microsoft.Network/networkInterfaces",
+        "apiVersion": "2018-08-01",
+        "name": "[variables('nicName')]",
+        "location": "[resourceGroup().location]",
+        "dependsOn": [
+          "[variables('publicIPAddressName')]"
+        ],
+        "properties": {
+          "ipConfigurations": [
+            {
+              "name": "ipconfig1",
+              "properties": {
+                "privateIPAllocationMethod": "Dynamic",
+                "publicIPAddress": {
+                  "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
+                },
+                "subnet": {
+                  "id": "[parameters('subnetReference')]"
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "Microsoft.Compute/virtualMachines",
+        "apiVersion": "2018-06-01",  
+        "name": "[parameters('vmName')]",
+        "location": "[resourceGroup().location]",
+        "dependsOn": [
+            "[variables('nicName')]"
+        ],
+        "properties": {
+          "hardwareProfile": {
+            "vmSize": "Standard_D1"
+          },
+          "osProfile": {
+            "computerName": "[parameters('vmName')]",
+            "adminUsername": "[parameters('adminUsername')]",
+            "adminPassword": "[parameters('adminPassword')]"
+          },
+          "storageProfile": {
+            "imageReference": {
+              "publisher": "SUSE",
+              "offer": "SLES",
+              "sku": "[parameters('suseOSVersion')]",
+              "version": "latest"
+            },
+            "osDisk": {
+              "name": "[concat(parameters('vmName'),'_OSDisk')]",
+              "caching": "ReadWrite",
+              "createOption": "FromImage"
+            },
+            "dataDisks": [
+              {
+                "diskSizeGB": 256,
+                "lun": 1,
+                "name": "[concat(parameters('vmName'),'_DataDisk')]",
+                "createOption": "Empty"
+              }
+            ]
+          },
+          "networkProfile": {
+            "networkInterfaces": [
+              {
+                "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName'))]"
+              }
+            ]
+          },
+          "diagnosticsProfile": {
+            "bootDiagnostics": {
+              "enabled": true,
+              "storageUri": "[reference(concat('Microsoft.Storage/storageAccounts/', parameters('storageAccountName')), '2018-07-01').primaryEndpoints.blob]"
+            }
+          }
+        },
+        "resources": [
+          {
+            "name": "oracleInstallScript",
+            "type": "extensions",
+            "location": "[resourceGroup().location]",
+            "apiVersion": "2018-06-01",
+            "dependsOn": [
+                "[parameters('vmName')]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.Azure.Extensions",
+                "type": "CustomScript",
+                "typeHandlerVersion": "2.0",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                "skipDos2Unix":false,
+                "timestamp":123456789         
+                },
+                "protectedSettings": {
+                    "commandToExecute": "bash install.sh",
+                    "storageAccountName": "[parameters('storageAccountName')]",
+                    "storageAccountKey": "[parameters('storageAccountKey')]",
+                    "fileUris": [
+                    "[parameters('scriptURL')]"
+                    ]  
+                }
+            }
+          }     
+        ]
+      }
+    ],
+    "outputs": {}
+  }

@@ -1,0 +1,40 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "subnetReference": {
+        "value": "/subscriptions/<subscriptionID>/resourceGroups/<rgName>/providers/Microsoft.Network/virtualNetworks/<vnetName>/subnets/<subnetName>"
+      },
+      "storageAccountName": {
+        "value": "myStorageAccount456"
+      },
+      "storageAccountKey": {
+        "reference": {
+          "keyVault": {
+            "id": "/subscriptions/<subscriptionID>/resourceGroups/<rgName>/providers/Microsoft.KeyVault/vaults/<keyVaultName>"
+          },
+          "secretName": "storageAccountKey"
+        }
+      },
+      "scriptURL": {
+        "value": "https://myStorageAccount456.blob.core.windows.net/oracle/install.sh"
+      },
+      "suseOSVersion": {
+        "value": "12-SP3"
+      },
+      "vmName": {
+        "value": "mySLES-01"
+      },
+      "adminUsername": {
+        "value": "Oracle"
+      },
+      "adminPassword": {
+        "reference": {
+          "keyVault": {
+            "id": "/subscriptions/<subscriptionID>/resourceGroups/<rgName>/providers/Microsoft.KeyVault/vaults/<keyVaultName>"
+          },
+          "secretName": "adminPassword"
+        }
+      }
+    }
+  }
