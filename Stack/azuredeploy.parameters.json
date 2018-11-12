@@ -16,8 +16,11 @@
           "secretName": "storageAccountKey"
         }
       },
-      "scriptURL": {
-        "value": "https://myStorageAccount456.blob.core.windows.net/oracle/install.sh"
+      "scriptURL1": {
+        "value": "https://gist.githubusercontent.com/ivanthelad/c21bb8beec4df99a59fb7d4841784e1e/raw/f7a7b7dba963f14c843a0c0fa63b9e32fab614d3/installbase.sh"
+      },
+      "scriptURL2": {
+        "value": "https://gist.githubusercontent.com/ivanthelad/c21bb8beec4df99a59fb7d4841784e1e/raw/f7a7b7dba963f14c843a0c0fa63b9e32fab614d3/oracle.yaml"
       },
       "suseOSVersion": {
         "value": "12-SP3"
