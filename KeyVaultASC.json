@@ -1,0 +1,133 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vaults_lama1018vault_name": {
+            "defaultValue": "lama1018vault",
+            "type": "String"
+        },
+        "secrets_testKey_name": {
+            "defaultValue": "testKey",
+            "type": "String"
+        },
+        "secrets_All_PAT_VSTS_name": {
+            "defaultValue": "All-PAT-VSTS",
+            "type": "String"
+        },
+        "secrets_adminPassword_name": {
+            "defaultValue": "adminPassword",
+            "type": "String"
+        },
+        "secrets_storageAccountKey_name": {
+            "defaultValue": "storageAccountKey",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.KeyVault/vaults",
+            "name": "[parameters('vaults_lama1018vault_name')]",
+            "apiVersion": "2016-10-01",
+            "location": "westeurope",
+            "tags": {},
+            "scale": null,
+            "properties": {
+                "sku": {
+                    "family": "A",
+                    "name": "standard"
+                },
+                "tenantId": "72f988bf-86f1-41af-91ab-2d7cd011db47",
+                "accessPolicies": [
+                    {
+                        "tenantId": "72f988bf-86f1-41af-91ab-2d7cd011db47",
+                        "objectId": "cee48ba6-0bd0-4093-b581-83a776df3629",
+                        "permissions": {
+                            "keys": [
+                                "Get",
+                                "List",
+                                "Update",
+                                "Create",
+                                "Import",
+                                "Delete",
+                                "Recover",
+                                "Backup",
+                                "Restore"
+                            ],
+                            "secrets": [
+                                "Get",
+                                "List",
+                                "Set",
+                                "Delete",
+                                "Recover",
+                                "Backup",
+                                "Restore"
+                            ],
+                            "certificates": [
+                                "Get",
+                                "List",
+                                "Update",
+                                "Create",
+                                "Import",
+                                "Delete",
+                                "Recover",
+                                "Backup",
+                                "Restore",
+                                "ManageContacts",
+                                "ManageIssuers",
+                                "GetIssuers",
+                                "ListIssuers",
+                                "SetIssuers",
+                                "DeleteIssuers"
+                            ],
+                            "storage": []
+                        }
+                    },
+                    {
+                        "tenantId": "72f988bf-86f1-41af-91ab-2d7cd011db47",
+                        "objectId": "7fa8d2ac-ca44-4b54-947f-c375e9b793d7",
+                        "permissions": {
+                            "keys": [],
+                            "secrets": [
+                                "get",
+                                "set"
+                            ],
+                            "certificates": [],
+                            "storage": []
+                        }
+                    },
+                    {
+                        "tenantId": "72f988bf-86f1-41af-91ab-2d7cd011db47",
+                        "objectId": "0894f955-42b1-4e71-9b74-97dc9473abf2",
+                        "permissions": {
+                            "keys": [],
+                            "secrets": [
+                                "get",
+                                "set"
+                            ],
+                            "certificates": [],
+                            "storage": []
+                        }
+                    },
+                    {
+                        "tenantId": "72f988bf-86f1-41af-91ab-2d7cd011db47",
+                        "objectId": "fbdd60e6-f9b9-4a53-9443-87b581514a64",
+                        "permissions": {
+                            "keys": [],
+                            "secrets": [
+                                "get",
+                                "set"
+                            ],
+                            "certificates": [],
+                            "storage": []
+                        }
+                    }
+                ],
+                "enabledForDeployment": false,
+                "enabledForDiskEncryption": false,
+                "enabledForTemplateDeployment": false
+            },
+            "dependsOn": []
+        }
+    ]
+}
